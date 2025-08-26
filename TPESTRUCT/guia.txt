@@ -1,0 +1,11 @@
+PRIMERO: 
+ gcc dlist.c -c -Wall -Wextra -Werror -std=c99 -g
+
+
+SEGUNDO:
+gcc primitivas.c -c -Wall -Wextra -Werror -std=c99 -g
+
+TERCERO:
+gcc main.c dlist.o primitivas.o -Wall -Wextra -Werror -std=c99 -g
+
+

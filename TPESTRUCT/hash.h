@@ -1,0 +1,51 @@
+#ifndef __HASH_H__
+#define __HASH_H__
+
+
+#define FACTORCARGA 0.75
+//lo ponemos directamente como char* pues ya sabemos que va a ser de ese tipo
+typedef struct {
+    char *nombre;      
+    char *definicion;  
+    int ocupado;//0 para decir ocupado 1 para decir disponible      
+} Hashcasillas;
+
+typedef struct {
+    Hashcasillas *casillas;   
+    size_t size;          
+    size_t casillasOcupadas;  
+} TablaHash;
+/*
+Funcion que dado un tamano crea un tabla hash de ese tamano, inicializa todas
+las casillas en NULL
+*/
+TablaHash* inicializarHash(size_t size);
+
+/*
+Como funcion HASH toma un string y sigue la funcion hash de djb2
+informacion obtenida: https://stackoverflow.com/questions/7666509/hash-function-for-string
+*/
+unsigned long hasheo(const char *str);
+
+/*
+DEfinimos instertar que dada una tabla hash, el nombre de la funcion o lista ingresada
+y lo que sigue luego del = (definicion) intenta insertar el nombre en nombre en caso de que este
+no s eencuentre retornando 1 en exito, caso contrario si el nombre ya se encuentra en la tabla
+retorna 0 para informar y no se inserta nada, pues no esta permitido la redefinicion de funciones/listas
+*/
+
+int insertar(TablaHash** tabla,char* nombre, char* definicion);
+
+/*
+Como bien dice su nombre busca si el nombre se encuentra en la lista
+si se encuentra retorna su definicion, caso contrario retorna NULL
+*/
+char* buscar(TablaHash *tabla, char *nombre);
+
+/*
+Funcion que utilizaremos una vez que se cierre los comandos, liberaremos la tabla hash
+*/
+void liberarHash(TablaHash *tabla) ;
+
+#endif
+
