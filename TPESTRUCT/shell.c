@@ -18,14 +18,22 @@ void iniciar_shell(){
         printf(">>");
         scanf(" %[^\n]",comando);
         char* Partes=strtok(comando," =");
+        if(Partes==NULL){
+            printf("Comando invalido");
+        }
         if(strcmp(Partes,"deff")==0){
-            funcion_deff(Partes)
+            Tabla_de_funciones=funcion_deff(Partes,Tabla_de_funciones);
         }
         else if(strcmp(Partes,"defl")==0){
-            //completar
+            Tabla_de_listas=funcion_defl(Partes,Tabla_de_listas);
         }
         else if(strcmp(Partes,"apply")==0){
-            //completar
+            int indice=0;
+            while(comando[indice]!='a'){
+                indice++;
+            }
+            //esto es para empezar depues del apply
+            funcion_apply(comando+indice+6,Tabla_de_funciones,Tabla_de_listas);
         }
         else if(strcmp(Partes,"search")==0){
             //completar
@@ -34,6 +42,7 @@ void iniciar_shell(){
             printf("Salieno del interprete...\n");
             //LIMPIAR HASH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             liberarHash(Tabla_de_funciones);
+            printf("CHECK\n");
             liberarHash(Tabla_de_listas);
             trabajo=0;
         }

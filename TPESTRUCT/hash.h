@@ -1,6 +1,8 @@
 #ifndef __HASH_H__
 #define __HASH_H__
-
+#include<stdlib.h>
+#include<string.h>
+#include<stddef.h>
 
 #define FACTORCARGA 0.75
 //lo ponemos directamente como char* pues ya sabemos que va a ser de ese tipo
@@ -29,23 +31,27 @@ unsigned long hasheo(const char *str);
 
 /*
 DEfinimos instertar que dada una tabla hash, el nombre de la funcion o lista ingresada
-y lo que sigue luego del = (definicion) intenta insertar el nombre en nombre en caso de que este
-no s eencuentre retornando 1 en exito, caso contrario si el nombre ya se encuentra en la tabla
-retorna 0 para informar y no se inserta nada, pues no esta permitido la redefinicion de funciones/listas
+y lo que sigue luego del = (definicion) inserta en la tabla el nombre con la definicion
 */
 
-int insertar(TablaHash** tabla,char* nombre, char* definicion);
+void insertar(TablaHash** tabla,char* nombre, char* definicion);
 
 /*
 Como bien dice su nombre busca si el nombre se encuentra en la lista
-si se encuentra retorna su definicion, caso contrario retorna NULL
+si se encuentra retorna su valor, caso contrario retorna NULL
 */
-char* buscar(TablaHash *tabla, char *nombre);
+char* buscar(TablaHash *tabla,char *nombre);
 
 /*
 Funcion que utilizaremos una vez que se cierre los comandos, liberaremos la tabla hash
 */
-void liberarHash(TablaHash *tabla) ;
+void liberarHash(TablaHash *tabla);
+
+/*
+Funcion que hace los mismo que strdup pero como usamos -std=c99 no se encuentra dentro de string.h
+lo que hace strdup es como el strcpy donde se usa un malloc en donde se va a copiar
+*/
+char *mi_strdup(char *original);
 
 #endif
 
