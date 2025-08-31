@@ -3,7 +3,10 @@
 
 #include"dlist.h"
 
-
+/*
+Copai fisica
+*/
+void* copyfisica(void* dato);
 /*
 FUncion cero_izq que dada una lista, agrega un cero a la izquierda, osea en la primera posicion
 */

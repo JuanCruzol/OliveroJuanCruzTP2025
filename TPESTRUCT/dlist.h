@@ -20,6 +20,8 @@ typedef int (*FuncionComparadora)(void* data1,void* data2);
 
 typedef void* (*FuncionCopia)(void* data);
 
+void destroy(void* dato);
+
 DNodo* crear_nodo();
 
 DList* crear_list();

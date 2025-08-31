@@ -2,6 +2,10 @@
 #include<stdlib.h>
 #include"dlist.h"
 
+void destroy(void* dato){
+    free(dato);
+}
+
 DNodo* crear_nodo(){
     return NULL;
 }
