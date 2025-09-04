@@ -1,5 +1,6 @@
 #ifndef __HASH_H__
 #define __HASH_H__
+
 #include<stdlib.h>
 #include<string.h>
 #include<stddef.h>
@@ -17,6 +18,17 @@ typedef struct {
     size_t size;          
     size_t casillasOcupadas;  
 } TablaHash;
+
+typedef struct NodoHash {
+    char* clave;
+    struct NodoHash* sig;
+} NodoHash;
+
+typedef struct {
+    NodoHash** casillas;
+    int capacidad;
+} HashSet;
+
 /*
 Funcion que dado un tamano crea un tabla hash de ese tamano, inicializa todas
 las casillas en NULL
@@ -52,6 +64,24 @@ Funcion que hace los mismo que strdup pero como usamos -std=c99 no se encuentra 
 lo que hace strdup es como el strcpy donde se usa un malloc en donde se va a copiar
 */
 char *mi_strdup(char *original);
+
+
+/*
+Funcion q crea una hashset
+*/
+HashSet* crear_hashset(int capacidad);
+
+/*
+Funcion q retorna 1 si la clave esta en el hashset, 0 en caso contrario
+*/
+int contienehashset(HashSet* hset, char* clave);
+
+/*
+inserta el elemento en la hasset
+*/
+HashSet* insertarHashset(HashSet* hset, char* clave);
+
+void destruirHashSet(HashSet* hset);
 
 #endif
 

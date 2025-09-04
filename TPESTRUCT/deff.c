@@ -3,9 +3,9 @@
 int verificacion_De_Comando(char* comando){
     char palabra[16];    // "deff" o "defl"
     char nombre[128];    // nombre de función o lista
-    char resto[4096];    // todo lo que sigue después del '='
+    char definicion[4096];    // todo lo que sigue después del '='
 
-    int n = sscanf(comando, " %15s %127[^=]= %4095[^\n]", palabra, nombre, resto);
+    int n = sscanf(comando, " %15s %127[^=]= %4095[^\n]", palabra, nombre, definicion);
     if (n != 3) {
         return 0; // no se pudo leer correctamente
     }
@@ -15,52 +15,33 @@ int verificacion_De_Comando(char* comando){
     while (isspace(nombre[inicio])) inicio++;
     while (fin >= inicio && isspace(nombre[fin])) fin--;
     nombre[fin + 1] = '\0';
-    if (inicio > 0) memmove(nombre, nombre + inicio, fin - inicio + 2);
-
-    // Verificar palabra
-    if (strcmp(palabra, "deff") != 0 && strcmp(palabra, "defl") != 0)
-        return 0;
-
-    // Verificar nombre no vacío
-    if (strlen(nombre) == 0)
-        return 0;
-
-    // Verificar resto no vacío
-    if (strlen(resto) == 0)
-        return 0;
-    //ahora q termine en ;
-    int len_resto = strlen(resto) - 1;
-    while(len_resto >= 0 && isspace(resto[len_resto])){
-        len_resto--;
+    if (inicio > 0){
+        memmove(nombre, nombre + inicio, fin - inicio + 2);///////////////////
     }
-    if(len_resto < 0 || resto[len_resto]!= ';'){
+    // Verificar palabra
+    if (strcmp(palabra, "deff") != 0 && strcmp(palabra, "defl") != 0){
+        return 0;
+    }
+    // Verificar nombre no vacío
+    if (strlen(nombre) == 0){
+        return 0;
+    }
+    // Verificar resto no vacío
+    if (strlen(definicion) == 0){
+        return 0;
+    }
+    //ahora q termine en ;
+    int len_def= strlen(definicion) - 1;
+    while(len_def >= 0 && isspace(definicion[len_def])){
+        len_def--;
+    }
+    if(len_def < 0 || definicion[len_def]!= ';'){
         return 0;
     }
     return 1;
 }
 
-int verificasion_PuntoYComa(char* definicion){
-    int indice=0;
-    while(definicion[indice]!='\0' && definicion[indice]!=';'){
-        indice++;
-    }
-    if(definicion[indice]=='\0'){
-        //recorrimos todo y no encontramos ; MAL
-        return 0;
-    }
-    int pos_de_PyC=indice;
-    indice++;//nos movemos a la siguente
-    while(definicion[indice]!='\0' && definicion[indice]==' '){
-        indice++;
-    }
-    if(definicion[indice]=='\0'){
-        definicion[pos_de_PyC]='\0';
-        //llegamos al final, despues del ; hay solo espacios esta bien
-        return 1;
-    }
-    //despues del ; habia otro caracter mal
-    return 0;
-}
+
 
 int isPrimitiva(char* nombre_fun){
     if(strcmp(nombre_fun,"0i")==0 ||strcmp(nombre_fun,"0d")==0||strcmp(nombre_fun,"Si")==0||strcmp(nombre_fun,"Sd")==0||strcmp(nombre_fun,"Di")==0 ||strcmp(nombre_fun,"Dd")==0){

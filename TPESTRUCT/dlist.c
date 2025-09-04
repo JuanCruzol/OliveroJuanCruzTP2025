@@ -6,6 +6,12 @@ void destroy(void* dato){
     free(dato);
 }
 
+void* copyfisicaentero(void* data){
+    int* dato_a_guardar=malloc(sizeof(int));
+    *dato_a_guardar=*(int*)data;
+    return dato_a_guardar;
+}
+
 DNodo* crear_nodo(){
     return NULL;
 }
@@ -61,6 +67,9 @@ void dnodo_recorrer(DList* list,FuncionVisitante f){
 }
 
 void destruir_Dnodo_Dlist(DList* list,FuncionDestructora destruc){
+    if(list==NULL){
+        return;
+    }
     DNodo* nodo=list->primero;
     DNodo* temp;
     for(;nodo!=NULL;){
@@ -74,4 +83,13 @@ void destruir_Dnodo_Dlist(DList* list,FuncionDestructora destruc){
 
 int Dlist_vacia(DList* list){
     return (list->primero==NULL);
+}
+
+DList* copia_dlist(DList*list){
+    DList* nueva_list=crear_list();
+    DNodo* temp=list->primero;
+    for(;temp!=NULL;temp=temp->sig){
+        dlist_agregar_ultimo(&nueva_list,temp->dato,copyfisicaentero);
+    }
+    return nueva_list;
 }

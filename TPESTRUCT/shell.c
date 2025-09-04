@@ -17,6 +17,7 @@ void iniciar_shell(){
             printf("Error\n");
         }
         else{
+            //sacamos \n
             comando[strcspn(comando, "\n")] = '\0';
 
             char copia[MAXBUFF];
@@ -52,7 +53,8 @@ void iniciar_shell(){
 
             }
             else if(strcmp(Partes,"search")==0){
-                //completar
+                
+                funcion_search(comando+7,Tabla_de_listas,Tabla_de_funciones);
             }
             else if(strcmp(Partes,"salir")==0){
                 printf("Salieno del interprete...\n");
@@ -61,10 +63,11 @@ void iniciar_shell(){
                 liberarHash(Tabla_de_listas);
                 trabajo=0;
             }
-        else{
-            printf("Comando Invalido\n");
+            
+            else{
+                printf("Comando Invalido\n");
+            }
         }
-    }
     }
 }
 

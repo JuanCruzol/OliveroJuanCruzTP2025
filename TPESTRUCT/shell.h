@@ -8,6 +8,7 @@
 #include<string.h>
 #include"hash.h"
 #include"dlist.h"
+#include"search.h"
 
 /*
 Iniciar_shell como bien dice su nombre se encarga de iniciar la shell

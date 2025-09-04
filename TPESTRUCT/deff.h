@@ -29,12 +29,6 @@ Una vez finalizado devuelve la tabla
 */
 TablaHash* funcion_deff(char* Comando,TablaHash* Tabla_de_funciones);
 
-/*
-Funcion que verifica que  se cumpla bien el ; osea que cuando haya ; luego solo puede haber una sucesion de " "
-donde obviamente termine con '\0', si luego del ; hay un caracter que no sea " " o '\0' se considera q esta mal
-tambien verifica que este si este no esta se considera que no se ingreso bien el comando
-*/
-int verificasion_PuntoYComa(char* definicion);
 
 /*
 Verifica que la funcion sea una primitiva

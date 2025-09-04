@@ -20,6 +20,9 @@ typedef int (*FuncionComparadora)(void* data1,void* data2);
 
 typedef void* (*FuncionCopia)(void* data);
 
+/*
+libera el dato
+*/
 void destroy(void* dato);
 
 DNodo* crear_nodo();
@@ -35,5 +38,7 @@ void dlist_agregar_ultimo(DList** list,void* dato,FuncionCopia copy);
 void dnodo_recorrer(DList* list,FuncionVisitante f);
 
 void destruir_Dnodo_Dlist(DList* list,FuncionDestructora destruc);
+
+DList* copia_dlist(DList*list);
 
 #endif

@@ -82,6 +82,10 @@ int isValidApply(char* definicion, TablaHash* tabla_de_funciones,TablaHash* tabl
     return isValidoFun(definicion,tabla_de_funciones);
 }
 
+void * copyDumm(void* dato){
+    return dato;
+}
+
 DList* pasar_a_lista(char* expresion_lista,TablaHash* tabla_de_listas){
     DList* estruc_lista=crear_list();
     //primero sacamos ;
@@ -106,9 +110,11 @@ DList* pasar_a_lista(char* expresion_lista,TablaHash* tabla_de_listas){
     //como esto ya paso por una validacion de listas lo q hacemos es usar el tokes con "[]" , "," y ";"
     char* partes_numericas=strtok(copy,"[ ] , ;");
     while(partes_numericas!=NULL){
-        int* valor_a_agregar = malloc(sizeof(int));
-        *valor_a_agregar = atoi(partes_numericas);
-        dlist_agregar_ultimo(&estruc_lista,(void*)valor_a_agregar,copyfisica);
+        int valor_a_agregar = atoi(partes_numericas);
+        int* valor_para_lista = malloc(sizeof(int));
+        *valor_para_lista=valor_a_agregar;
+        dlist_agregar_ultimo(&estruc_lista,(void*)valor_para_lista,copyDumm);
+
         partes_numericas=strtok(NULL,"[ ] , ;");
     }
     return estruc_lista;
@@ -138,18 +144,21 @@ DList* aplicar_primitiva(char* comando,DList* lista){
 }
 
 DList* aplicar_repeticion(DList* lista,char *comando,TablaHash* tabla_de_funciones){
-
     //esto por si esta vacia
     if(lista->primero == NULL || lista->ultimo == NULL){
         return lista;
     }
-    int primero=*(int*)lista->primero->dato;
-    int ultimo=*(int*)lista->ultimo->dato;
-    if(primero == ultimo){
+    int primero_dato=*(int*)lista->primero->dato;
+    int ultimo_dato=*(int*)lista->ultimo->dato;
+    if(primero_dato == ultimo_dato){
         return lista;
     }
-    lista=aplicar_funcion_a_lista(lista,comando,tabla_de_funciones);
-    return aplicar_repeticion(lista,comando,tabla_de_funciones);
+    DList* nueva_lista=aplicar_funcion_a_lista(lista,comando,tabla_de_funciones);
+    if(nueva_lista != lista) {
+        destruir_Dnodo_Dlist(lista, free);
+    }
+    lista = nueva_lista;
+    return aplicar_repeticion(nueva_lista,comando,tabla_de_funciones);
 }
 
 DList* aplicar_funcion_a_lista(DList* lista, char* funcion,TablaHash* tabla_de_funciones){
@@ -157,6 +166,7 @@ DList* aplicar_funcion_a_lista(DList* lista, char* funcion,TablaHash* tabla_de_f
     strcpy(copy,funcion);
     int indice=0;
     char comando[1024];
+    DList* lista_resultado=lista;
     //lo usamos a pos para ir copiando las funciones de funciones de funcion
     int pos;
     int flag=1;
@@ -178,15 +188,16 @@ DList* aplicar_funcion_a_lista(DList* lista, char* funcion,TablaHash* tabla_de_f
             }
             //cuando se rompa esto ya copiamos la primera funcion
             comando[pos]='\0';
+            DList* lista_temporal = lista_resultado;
             if(isPrimitiva(comando)){
-                lista=aplicar_primitiva(comando,lista);
+                lista_resultado = aplicar_primitiva(comando, lista_resultado); 
             }
             else{
                 //la busacamos en la tabla
                 char* funcion_extendida=buscar(tabla_de_funciones,comando);
                 if(funcion_extendida!=NULL){
-                    printf("%s\n",funcion_extendida);
-                    lista=aplicar_funcion_a_lista(lista,funcion_extendida,tabla_de_funciones);
+                    lista_resultado=aplicar_funcion_a_lista(lista_resultado,funcion_extendida,tabla_de_funciones);
+                    
                 }
                 else{
                     //esto es para sacar los < >de la palabra
@@ -194,13 +205,19 @@ DList* aplicar_funcion_a_lista(DList* lista, char* funcion,TablaHash* tabla_de_f
                     strncpy(limpio,comando+1,pos-2);
                     limpio[pos-2]='\0';
                     //si no es una primitiva, ni una definida en la tabla, es porq es una del tipo <...>
-                    lista=aplicar_repeticion(lista,limpio,tabla_de_funciones); //hacer
+                    lista_resultado=aplicar_repeticion(lista_resultado,limpio,tabla_de_funciones); //hacer
+                    
+                    
                 }
             }
+            if(lista_temporal != lista_resultado && lista_temporal!=lista) {
+                destruir_Dnodo_Dlist(lista_temporal, free);
+            }
+            
         }
 
     }
-    return lista;
+    return lista_resultado;
 }
 
 void imprimir_Lista(DList* lista){
@@ -236,6 +253,6 @@ void funcion_apply(char* definicion, TablaHash* tabla_de_funciones,TablaHash* ta
     lista=aplicar_funcion_a_lista(lista,funciones,tabla_de_funciones);
     
     imprimir_Lista(lista);
-
-    destruir_Dnodo_Dlist(lista,destroy);
+    //le pasamos como destrucot la funcion free
+    destruir_Dnodo_Dlist(lista,free);
 }

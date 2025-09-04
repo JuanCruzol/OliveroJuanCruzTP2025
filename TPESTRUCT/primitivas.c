@@ -47,6 +47,7 @@ void borrar_izq(DList** list){
         (*list)->primero=nodo_a_eliminar->sig;
         (*list)->primero->ant=NULL;
     }
+    free(nodo_a_eliminar->dato);
     free(nodo_a_eliminar);
 }
 
@@ -64,6 +65,6 @@ void borrar_der(DList** list){
         (*list)->ultimo=nodo_a_eliminar->ant;
         (*list)->ultimo->sig=NULL;
     }
-
+    free(nodo_a_eliminar->dato);
     free(nodo_a_eliminar);
 }
