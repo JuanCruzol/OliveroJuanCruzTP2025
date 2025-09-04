@@ -6,10 +6,10 @@ char *mi_strdup(char *origal){
     return copia;
 }
 
-TablaHash* inicializarHash(size_t size) {
+TablaHash* inicializarHash(unsigned int size){
     TablaHash *tabla = malloc(sizeof(TablaHash));
     tabla->casillas = malloc(sizeof(Hashcasillas)*size);
-    for (size_t i = 0; i < size; i++){
+    for (unsigned int i = 0; i < size; i++){
         tabla->casillas[i].ocupado=0;
         tabla->casillas[i].nombre=NULL;
         tabla->casillas[i].definicion=NULL;
@@ -30,10 +30,10 @@ unsigned long hasheo(const char *str){
 }
 
 void rehash(TablaHash **tabla) {
-    size_t nuevoSize = (*tabla)->size * 2 + 1; // tamaño nuevo
+    unsigned int nuevoSize = (*tabla)->size * 2 + 1; // tamaño nuevo
     TablaHash *nueva = inicializarHash(nuevoSize);
-    size_t size=(*tabla)->size;
-    for (size_t i = 0; i < size; i++) {
+    unsigned int size=(*tabla)->size;
+    for (unsigned int i = 0; i < size; i++) {
         if ((*tabla)->casillas[i].ocupado) {
             insertar(&nueva, (*tabla)->casillas[i].nombre, (*tabla)->casillas[i].definicion);
             free((*tabla)->casillas[i].nombre);
@@ -48,34 +48,38 @@ void rehash(TablaHash **tabla) {
 
 void insertar(TablaHash **tabla,char *nombre,char *definicion){
     
-    double FactorCarga = (double) ((*tabla)->casillasOcupadas + 1) / (*tabla)->size;
-    if (FactorCarga > FACTORCARGA) {
+    double FactorCarga = (double)((*tabla)->casillasOcupadas + 1)/(*tabla)->size;
+    if (FactorCarga > FACTORCARGA){
         rehash((tabla));
     }
     int flag=1;
-    size_t indice = hasheo(nombre) % (*tabla)->size;
-    while ((*tabla)->casillas[indice].ocupado && flag) {
-        if (strcmp((*tabla)->casillas[indice].nombre, nombre) == 0) {
-            flag=0;;
+    unsigned int indice=hasheo(nombre) % (*tabla)->size;
+    while((*tabla)->casillas[indice].ocupado && flag){
+        if(strcmp((*tabla)->casillas[indice].nombre, nombre)==0){
+            flag=0;
         }
         else{ 
-            indice = (indice + 1) % ((*tabla)->size);
+            indice=(indice + 1)%((*tabla)->size);
         }
     }
-    (*tabla)->casillas[indice].nombre = mi_strdup(nombre);
-    (*tabla)->casillas[indice].definicion = mi_strdup(definicion);
-    (*tabla)->casillas[indice].ocupado = 1;
+    (*tabla)->casillas[indice].nombre=mi_strdup(nombre);
+    if(definicion==NULL){
+        (*tabla)->casillas[indice].definicion=NULL;
+    }
+    else{
+        (*tabla)->casillas[indice].definicion=mi_strdup(definicion);
+    }
+    (*tabla)->casillas[indice].ocupado=1;
     (*tabla)->casillasOcupadas++;
-    return;
 }
 
 char* buscar(TablaHash *tabla, char *nombre) {
-    size_t indice = hasheo(nombre) % tabla->size;
-    size_t inicio = indice; 
-    int bandera = 1;
-    char* resultado = NULL; 
-    while (tabla->casillas[indice].ocupado && bandera) {
-        if (strcmp(tabla->casillas[indice].nombre,nombre)==0){
+    unsigned int indice=hasheo(nombre) % tabla->size;
+    unsigned int inicio=indice; 
+    int bandera=1;
+    char* resultado=NULL; 
+    while(tabla->casillas[indice].ocupado && bandera){
+        if(strcmp(tabla->casillas[indice].nombre,nombre)==0){
             //lo guardamos
             resultado=tabla->casillas[indice].definicion; 
             //SAlimos porq lo encontramos
@@ -89,71 +93,19 @@ char* buscar(TablaHash *tabla, char *nombre) {
             }
         }
     }
-    return resultado; // un solo return al final
+    return resultado; 
 }
-void liberarHash(TablaHash *tabla) {
-    size_t size=tabla->size;
-    for (size_t i = 0; i < size; i++) {
-        if (tabla->casillas[i].ocupado) {
+void liberarHash(TablaHash *tabla){
+    unsigned int size=tabla->size;
+    for (unsigned int i=0; i<size;i++){
+        if (tabla->casillas[i].ocupado){
             free(tabla->casillas[i].nombre);
-            free(tabla->casillas[i].definicion);
+            if(tabla->casillas[i].definicion!=NULL){
+                free(tabla->casillas[i].definicion);
+            }
         }
     }
     free(tabla->casillas);
     free(tabla);
-}
-
-
-HashSet* crear_hashset(int capacidad) {
-    HashSet* hset = malloc(sizeof(HashSet));
-    hset->capacidad = capacidad;
-    hset->casillas = malloc(capacidad*sizeof(NodoHash*));
-    for (int i = 0; i < capacidad; i++) {
-        hset->casillas[i] = NULL;
-    }
-    return hset;
-}
-
-int contienehashset(HashSet* hset, char* clave) {
-    unsigned long indice = hasheo(clave) % hset->capacidad;
-    NodoHash* nodo = hset->casillas[indice];
-    int encontrado=0;
-    while (nodo && !encontrado) {
-        if (strcmp(nodo->clave, clave) == 0){
-         encontrado= 1;
-        }
-        nodo = nodo->sig;
-    }
-    return encontrado;
-}
-
-HashSet* insertarHashset(HashSet* hset, char* clave){
-    if (contienehashset(hset, clave)){
-        return hset;
-    }
-    unsigned long indice = hasheo(clave) % hset->capacidad;
-    NodoHash* nodo = malloc(sizeof(NodoHash));
-    nodo->clave = mi_strdup(clave);
-    nodo->sig = hset->casillas[indice];
-    hset->casillas[indice] = nodo;
-    return hset;
-}
-
-void destruirHashSet(HashSet* hset){
-    if (!hset){
-        return;
-    }
-    for (int i = 0; i < hset->capacidad; i++){
-        NodoHash* nodo = hset->casillas[i];
-        while (nodo!=NULL) {
-            NodoHash* siguiente = nodo->sig;
-            free(nodo->clave); // liberar la cadena
-            free(nodo);        // liberar el nodo
-            nodo = siguiente;
-        }
-    }
-
-    free(hset->casillas); // liberar el arreglo de casillas
-    free(hset);           // liberar el hashset
 }
 

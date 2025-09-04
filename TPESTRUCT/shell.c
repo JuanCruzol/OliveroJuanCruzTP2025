@@ -2,7 +2,9 @@
 
 
 #define MAXBUFF 4096 //4KB, usado normalmente en otros interepretes
-#define PRIMOINICIAL 1019 // con este primo inicializaremos las 2 tablas hash
+#define PRIMOINICIAL 73 // con este primo inicializaremos las 2 tablas hash, es un numero bajo pues no vamos a escribir mucho
+                        //si vamos a hacer mas, esto se deberia de aumentar, antes estaba en un numero primo mayor a 1000 y
+                        //consumia mucha memerio de manera inesesaria
 
 
 void iniciar_shell(){

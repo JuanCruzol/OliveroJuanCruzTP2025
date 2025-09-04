@@ -15,25 +15,15 @@ typedef struct {
 
 typedef struct {
     Hashcasillas *casillas;   
-    size_t size;          
-    size_t casillasOcupadas;  
+    unsigned int size;          
+    unsigned int casillasOcupadas;  
 } TablaHash;
-
-typedef struct NodoHash {
-    char* clave;
-    struct NodoHash* sig;
-} NodoHash;
-
-typedef struct {
-    NodoHash** casillas;
-    int capacidad;
-} HashSet;
 
 /*
 Funcion que dado un tamano crea un tabla hash de ese tamano, inicializa todas
 las casillas en NULL
 */
-TablaHash* inicializarHash(size_t size);
+TablaHash* inicializarHash(unsigned int size);
 
 /*
 Como funcion HASH toma un string y sigue la funcion hash de djb2
@@ -66,22 +56,6 @@ lo que hace strdup es como el strcpy donde se usa un malloc en donde se va a cop
 char *mi_strdup(char *original);
 
 
-/*
-Funcion q crea una hashset
-*/
-HashSet* crear_hashset(int capacidad);
-
-/*
-Funcion q retorna 1 si la clave esta en el hashset, 0 en caso contrario
-*/
-int contienehashset(HashSet* hset, char* clave);
-
-/*
-inserta el elemento en la hasset
-*/
-HashSet* insertarHashset(HashSet* hset, char* clave);
-
-void destruirHashSet(HashSet* hset);
 
 #endif
 

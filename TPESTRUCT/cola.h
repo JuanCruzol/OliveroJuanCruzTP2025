@@ -1,17 +1,10 @@
 #ifndef __COLA_H__
 #define __COLA_H__
 
-typedef struct _Gnodo{
-    void* dato;
-    struct _Gnodo* sig;
-}Gnodo;
+#include"dlist.h"
 
-typedef struct Glist{
-    Gnodo* primero;
-    Gnodo* ultimo;
-}Glist;
 
-typedef Glist* Cola;
+typedef DList* Cola;
 
 typedef void(*FuncioneVisitante)(void*);
 typedef void*(*FuncioneCopia)(void*);

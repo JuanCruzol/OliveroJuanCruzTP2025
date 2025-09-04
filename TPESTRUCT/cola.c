@@ -3,14 +3,14 @@
 #include<stdlib.h>
 
 Cola crear_cola(){
-    Cola cola=malloc(sizeof(Glist));
+    Cola cola=malloc(sizeof(DList));
     cola->primero=NULL;
     cola->ultimo=NULL;
     return cola;
 }
 
 Cola agregar_dato_prioridad(Cola cola,void* dato,FuncioneCopia copy){
-    Gnodo* nuevo_nodo=malloc(sizeof(Gnodo));
+    DNodo* nuevo_nodo=malloc(sizeof(DNodo));
     nuevo_nodo->dato=copy(dato);
     nuevo_nodo->sig=cola->primero;
     if(cola->ultimo==NULL){
@@ -21,7 +21,7 @@ Cola agregar_dato_prioridad(Cola cola,void* dato,FuncioneCopia copy){
 }
 
 Cola cola_encolar(Cola cola,void* dato,FuncioneCopia copy){
-    Gnodo* nuevo_nodo=malloc(sizeof(Gnodo));
+    DNodo* nuevo_nodo=malloc(sizeof(DNodo));
     if(!nuevo_nodo){
         return NULL;
     }
@@ -46,7 +46,7 @@ void* cola_desencolar(Cola cola){
     if(cola->primero==NULL){
         return NULL;
     }
-    Gnodo* nodo_a_eliminar=cola->primero;
+    DNodo* nodo_a_eliminar=cola->primero;
     void* dato =nodo_a_eliminar->dato;
     cola->primero=cola->primero->sig;
 
@@ -63,15 +63,15 @@ void* cola_inicio(Cola cola){
 }
 
 void cola_imprimir(Cola cola, FuncioneVisitante f){
-    Gnodo* temp=cola->primero;
+    DNodo* temp=cola->primero;
     for(;temp!=NULL;temp=temp->sig){
         f(temp->dato);
     }
 }
 
 void cola_destruir(Cola cola,FuncionDestructora destroy){
-    Gnodo* temp=cola->primero;
-    Gnodo* nodo_a_eliminar;
+    DNodo* temp=cola->primero;
+    DNodo* nodo_a_eliminar;
     while(temp!=NULL){
         nodo_a_eliminar=temp;
         temp=temp->sig;

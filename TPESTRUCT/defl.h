@@ -5,6 +5,11 @@
 #include"deff.h"
 
 /*
+Funcion q dado un char retorna 1 si es un char numerico, 0 caso contrario
+*/
+int isNumber(char fragmento);
+
+/*
 Verifica que la definicion de lista sea valida
 se habra y se cierre []
 adentro haya numeros, desp de eso "," y otro numero

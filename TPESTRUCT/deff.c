@@ -5,18 +5,21 @@ int verificacion_De_Comando(char* comando){
     char nombre[128];    // nombre de función o lista
     char definicion[4096];    // todo lo que sigue después del '='
 
-    int n = sscanf(comando, " %15s %127[^=]= %4095[^\n]", palabra, nombre, definicion);
+    int n = sscanf(comando, " %15s %127[^=]= %1045[^\n]", palabra, nombre, definicion);
     if (n != 3) {
-        return 0; // no se pudo leer correctamente
+        return 0;
     }
-
-    // Limpiar espacios al inicio y fin del nombre
     int inicio = 0, fin = strlen(nombre) - 1;
-    while (isspace(nombre[inicio])) inicio++;
-    while (fin >= inicio && isspace(nombre[fin])) fin--;
-    nombre[fin + 1] = '\0';
+    while (isspace(nombre[inicio])){
+        inicio++;
+    }
+    while (fin >= inicio && isspace(nombre[fin])){
+        fin--;
+    }
+    nombre[fin+1]='\0';
     if (inicio > 0){
-        memmove(nombre, nombre + inicio, fin - inicio + 2);///////////////////
+        //corremos para que nombre para q apunte al primer caracter q no sea un espacio
+        memmove(nombre, nombre + inicio, fin - inicio + 2);
     }
     // Verificar palabra
     if (strcmp(palabra, "deff") != 0 && strcmp(palabra, "defl") != 0){
@@ -53,8 +56,8 @@ int isPrimitiva(char* nombre_fun){
 
 
 int isValidoFun(char* definicion,TablaHash* Tabla_de_funiones){
-    char copy[4096];
-    char token[4096];
+    char copy[1045];
+    char token[1045];
     strcpy(copy,definicion);
     int indice=0;
     int flag=1;
@@ -94,7 +97,7 @@ int isValidoFun(char* definicion,TablaHash* Tabla_de_funiones){
                 flag=0;
             }
             else{ 
-                char subexpr[4096];
+                char subexpr[1045];
                 strncpy(subexpr, copy + indice + 1, j - indice - 2);//copiamos la subexpresion dentro del < >
                 subexpr[j - indice - 2] = '\0';
 

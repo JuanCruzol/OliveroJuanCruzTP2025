@@ -189,7 +189,7 @@ int verificar_search(char* comando, TablaHash* tabla_de_listas,Estado** listas_i
 Estado* crear_estado(){
     Estado* nuevo_estado=malloc(sizeof(Estado));
     //cantidad inicial para nuestro array de listas
-    nuevo_estado->cant_max=10000;
+    nuevo_estado->cant_max=100;
     nuevo_estado->size=0;
     nuevo_estado->lista_de_lista=malloc(sizeof(DList*)*nuevo_estado->cant_max);
     for(int i=0;i<nuevo_estado->cant_max;i++){
@@ -246,7 +246,7 @@ Estado* aplicar_funcion_a_estado(Estado* actual_esatado, char* funcion_a_aplicar
 
 Arreglo_Dlist* inicializar_lista_de_lista(){
     Arreglo_Dlist * nueva_l_de_l=malloc(sizeof(Arreglo_Dlist));
-    nueva_l_de_l->cant_max=10000;
+    nueva_l_de_l->cant_max=100;
     nueva_l_de_l->size=0;
     nueva_l_de_l->lista_de_lista=malloc(sizeof(DList*)*nueva_l_de_l->cant_max);
     for(int i=0;i<nueva_l_de_l->cant_max;i++){
@@ -312,6 +312,34 @@ int lista_de_listas_iguales(DList** lista_de_lista1,DList** lista_de_lista2,int 
     return iguales;
 }
 
+char* pasar_lista_a_string(DList* lista){
+    char* salida=malloc(sizeof(char)*512);
+    salida[0]='[';
+    salida[1] = '\0';
+    DNodo* temp=lista->primero;
+    while(temp!=NULL){
+        char numero_de_lista[10];
+        sprintf(numero_de_lista,"%d",*(int*)temp->dato);
+        strcat(salida,numero_de_lista);
+        if (temp->sig != NULL){
+            strcat(salida, ",");
+        }
+        temp=temp->sig;
+    }
+    strcat(salida,"]");
+    return salida;
+}
+
+char* agregar_secuencia_de_lista(Estado* lista_d_lista){
+    char* secuencia_de_lista=malloc(sizeof(char)*1024);
+    secuencia_de_lista[0]='\0';
+    for(int i=0;i<lista_d_lista->size;i++){
+        char* lista_a_agregar=pasar_lista_a_string(lista_d_lista->lista_de_lista[i]);
+        strcat(secuencia_de_lista,lista_a_agregar);
+        free(lista_a_agregar);
+    }
+    return secuencia_de_lista;
+}
 
 
 void buscar_solucion(Estado* estado_init,Arreglo_Dlist* l_de_l,TablaHash* tabla_de_funciones){
@@ -319,8 +347,10 @@ void buscar_solucion(Estado* estado_init,Arreglo_Dlist* l_de_l,TablaHash* tabla_
 
     cola_estados=cola_encolar(cola_estados,estado_init,coppySimbolica);
 
-    HashSet* listas_visitadas=crear_hashset(100);
-    listas_visitadas=insertarHashset(listas_visitadas,estado_init->cadena_formada);
+    TablaHash* listas_visitadas=inicializarHash(100);
+    char* lista_ya_pasada=agregar_secuencia_de_lista(estado_init);
+    insertar(&listas_visitadas,lista_ya_pasada,lista_ya_pasada);
+    free(lista_ya_pasada);
     
     int solucion_encontrada=0;
     int numero_de_iteracion=0;
@@ -332,32 +362,45 @@ void buscar_solucion(Estado* estado_init,Arreglo_Dlist* l_de_l,TablaHash* tabla_
             destruir_estado(estado_actual);
         }
         else{
-            char* funciones_a_aplicar[]={"0i","0d","Si","Sd","Dd","Di"};
-            for(int i=0;i<6;i++){
-                Estado* siguiente_estado=copiar_estado(estado_actual);
-                siguiente_estado=aplicar_funcion_a_estado(siguiente_estado,funciones_a_aplicar[i],tabla_de_funciones);
-                if(contienehashset(listas_visitadas,siguiente_estado->cadena_formada)){
-                    destruir_estado(siguiente_estado);
-                }
-                else{
-                    cola_estados=cola_encolar(cola_estados,siguiente_estado,coppySimbolica);
-                }
-            }
-            //ahora a la tabla
+            //primero veamos la tabla, capaz q ya tenemos una funcion q nos acorta mucho camino
             for(size_t j=0;j<tabla_de_funciones->size;j++){
                 Hashcasillas* funcion_definida=&(tabla_de_funciones->casillas[j]);
                 if(funcion_definida->ocupado){
                     Estado* siguiente_estado=copiar_estado(estado_actual);
                     siguiente_estado= aplicar_funcion_a_estado(siguiente_estado,funcion_definida->nombre,tabla_de_funciones);
-                    if(contienehashset(listas_visitadas,siguiente_estado->cadena_formada)){
+                    char* lista_ya_pasada=agregar_secuencia_de_lista(siguiente_estado);
+                    if(buscar(listas_visitadas,lista_ya_pasada)!=NULL){
                         destruir_estado(siguiente_estado);
+                        
                     }
                     else{
                         cola_estados=cola_encolar(cola_estados,siguiente_estado,coppySimbolica);
+                    
+                        insertar(&listas_visitadas,lista_ya_pasada,lista_ya_pasada);
+                        
                     }
+                    free(lista_ya_pasada);
                 }
             }
 
+            char* funciones_a_aplicar[]={"0i","0d","Si","Sd","Dd","Di"};
+            for(int i=0;i<6;i++){
+                Estado* siguiente_estado=copiar_estado(estado_actual);
+                siguiente_estado=aplicar_funcion_a_estado(siguiente_estado,funciones_a_aplicar[i],tabla_de_funciones);
+                char* lista_ya_pasada=agregar_secuencia_de_lista(siguiente_estado);
+                
+                if(buscar(listas_visitadas,lista_ya_pasada)!=NULL){
+                    destruir_estado(siguiente_estado);
+                    
+                }
+                else{
+                    cola_estados=cola_encolar(cola_estados,siguiente_estado,coppySimbolica);
+                    insertar(&listas_visitadas,lista_ya_pasada,lista_ya_pasada);
+
+                    
+                }
+                free(lista_ya_pasada);
+            }
             destruir_estado(estado_actual);
         }
         numero_de_iteracion++;
@@ -367,10 +410,10 @@ void buscar_solucion(Estado* estado_init,Arreglo_Dlist* l_de_l,TablaHash* tabla_
         destruir_estado(esatdo_a_destruir);
     }
     cola_destruir(cola_estados,free);
-    destruirHashSet(listas_visitadas);
+    liberarHash(listas_visitadas);
     destruir_lista_de_lista(l_de_l);
     if(!(numero_de_iteracion<MAX_ITER)){
-        printf("se llego al maximo de iteraciones\n");
+        printf("se llego al maximo de iteraciones, si quiere seguir probando aumnente la misma\n");
     }
 }
 
@@ -380,7 +423,9 @@ void funcion_search(char* comando, TablaHash* tabla_de_listas,TablaHash* tabla_d
     Arreglo_Dlist* l_de_l=inicializar_lista_de_lista();
     if(!verificar_search(comando,tabla_de_listas,&estado_init,&l_de_l)){
         printf("Comando search invalido!\n");
+        destruir_estado(estado_init);
+        destruir_lista_de_lista(l_de_l);
+        return;
     }
     buscar_solucion(estado_init,l_de_l,tabla_de_funciones);
-
 }
